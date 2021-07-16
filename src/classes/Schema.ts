@@ -47,7 +47,7 @@ export default class Schema {
         return this.loadLocalization().then(this.loadSchema.bind(this));
     }
 
-    public downloadFullItemSchema(start = 0) : Promise<void> {
+    private _downloadFullItemSchema(start = 0) : Promise<number | null> {
         return new Promise((resolve, reject) => {
             axios.get(ITEMS_SCHEMA, {
                 params: {
@@ -63,16 +63,26 @@ export default class Schema {
                 if (!this.rawFullItemSchema.hasOwnProperty("items")) {
                     this.rawFullItemSchema = data.result;
                 } else {
-                    this.rawFullItemSchema.items.concat(data.result.items);
+                    this.rawFullItemSchema.items = this.rawFullItemSchema.items.concat(data.result.items);
                 }
 
                 if (data.result.next) {
-                    return resolve(this.downloadFullItemSchema(data.result.next));
+                    resolve(data.result.next);
                 } else {
-                    resolve();
+                    resolve(null);
                 }
             });
         });
+    }
+
+    public async downloadFullItemSchema() : Promise<void> {
+        let index: number | null = 0;
+
+        while (index !== null) {
+            index = await this._downloadFullItemSchema(index);
+        }
+
+        return;
     }
 
     public loadLocalization() : Promise<void> {
@@ -186,7 +196,7 @@ export default class Schema {
                 raw: {
                     schema: {
                         ...this.rawSchemaOverview,
-                        items: this.rawFullItemSchema,
+                        items: this.rawFullItemSchema.items,
                     },
                     items_game: this.rawItemsGame,
                 }
