@@ -1,14 +1,14 @@
 # Ignore compiled code
-./build
+/build
 
 # Ignore modules
-./node_modules
+/node_modules
 
 # NPM crap
 package-lock.json
 
 # Logs
-./logs
+/logs
 *.log
 
 # Sensitive information
