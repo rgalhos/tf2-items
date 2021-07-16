@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import axios from "axios";
 import { fullNameToSku, skuToFullName as _skuToFullName, skuToItemObject as _skuToItemObject } from "../lib/sku";
 const vdf = require("vdf");
@@ -9,7 +10,8 @@ if (!process.env.STEAM_WEBAPI_KEY) {
 
 //const ITEMSGAME_URL = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt";
 const LOCALIZATION_TF_ENGLISH = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/resource/tf_english.txt";
-const SCHEMA_OVERVIEW_URL = "http://api.steampowered.com/IEconItems_440/GetSchemaOverview/v0001/?key=" + process.env.STEAM_WEBAPI_KEY + "&language=english";
+const SCHEMA_OVERVIEW_URL = "http://api.steampowered.com/IEconItems_440/GetSchemaOverview/v0001/";
+const ITEMS_SCHEMA = "http://api.steampowered.com/IEconItems_440/GetSchemaItems/v0001/";
 
 export default class Schema {
     private readonly rawItemsByDefindex = new Map<number, string>();
@@ -17,6 +19,9 @@ export default class Schema {
     private readonly itemsByName = new Map<string, number>();
     private readonly unusualEffectsById = new Map<number, string>();
     private readonly unusualEffectsByName = new Map<string, number>();
+    private rawSchemaOverview: any = {};
+    private rawFullItemSchema: any = {};
+    private rawItemsGame: any = {};
     private localization: any = {};
     private ready: boolean = false;
 
@@ -30,8 +35,44 @@ export default class Schema {
         return this.ready;
     }
 
+    public getRawItemSchema() {
+        return this.rawFullItemSchema;
+    }
+
+    public getRawItemsGame() {
+        return this.rawItemsGame;
+    }
+
     public load() {
         return this.loadLocalization().then(this.loadSchema.bind(this));
+    }
+
+    public downloadFullItemSchema(start = 0) : Promise<void> {
+        return new Promise((resolve, reject) => {
+            axios.get(ITEMS_SCHEMA, {
+                params: {
+                    key: process.env.STEAM_WEBAPI_KEY,
+                    language: "english",
+                    start: start
+                }
+            }).then(({ status, statusText, data }) => {
+                if (status !== 200) {
+                    return reject(`failed to get full item schema: status code not 200: ${statusText} (${status})`);
+                }
+
+                if (!this.rawFullItemSchema.hasOwnProperty("items")) {
+                    this.rawFullItemSchema = data.result;
+                } else {
+                    this.rawFullItemSchema.items.concat(data.result.items);
+                }
+
+                if (data.result.next) {
+                    return resolve(this.downloadFullItemSchema(data.result.next));
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 
     public loadLocalization() : Promise<void> {
@@ -54,14 +95,18 @@ export default class Schema {
         this.clearMaps();
 
         return new Promise((resolve, reject) => {
-            axios.get(SCHEMA_OVERVIEW_URL).then(({ status, data: schemaOverview }) => {
-                schemaOverview = JSON.parse(schemaOverview);
-
+            axios.get(SCHEMA_OVERVIEW_URL, {
+                params: {
+                    key: process.env.STEAM_WEBAPI_KEY,
+                    language: "english",
+                }
+            }).then(({ status, data: schemaOverview }) => {
                 if (status !== 200) {
                     return reject("failed to get schema overview: status code not 200");
                 }
 
                 schemaOverview = schemaOverview.result;
+                this.rawSchemaOverview = schemaOverview;
 
                 if (schemaOverview.status !== 1) {
                     return reject("failed to get schema overview: invalid response");
@@ -84,7 +129,8 @@ export default class Schema {
                         return reject("failed to get items_game: status code not 200");
                     }
 
-                    items = Object.entries(vdf.parse(items).items_game.items);
+                    this.rawItemsGame = vdf.parse(items).items_game;
+                    items = Object.entries(this.rawItemsGame.items);
 
                     items.forEach(([ defindex, item ]: [number, any]) => {
                         if (item.item_name
@@ -124,6 +170,33 @@ export default class Schema {
                 });
             })
             .catch(reject);
+        });
+    }
+
+    public dumpSchema(path: fs.PathOrFileDescriptor, version = "1.3.0") : Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (!this.isReady || Object.keys(this.rawFullItemSchema).length === 0) {
+                return reject("schema not loaded");
+            }
+
+            fs.writeFile(path, JSON.stringify({
+                success: true,
+                version: version,
+                time: Date.now(),
+                raw: {
+                    schema: {
+                        ...this.rawSchemaOverview,
+                        items: this.rawFullItemSchema,
+                    },
+                    items_game: this.rawItemsGame,
+                }
+            }), (err) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve();
+            })
         });
     }
 
