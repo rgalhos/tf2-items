@@ -1,0 +1,15 @@
+# Ignore compiled code
+./build
+
+# Ignore modules
+./node_modules
+
+# NPM crap
+package-lock.json
+
+# Logs
+./logs
+*.log
+
+# Sensitive information
+.env

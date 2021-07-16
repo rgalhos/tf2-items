@@ -1,0 +1,27 @@
+enum EQuality {
+    Normal = 0,
+    Genuine = 1,
+    // rarity1 = 2,
+    Vintage = 3,
+    // rarity3 = 4,
+    Unusual = 5,
+    Unique = 6,
+    Community = 7,
+    Valve = 8,
+    SelfMade = 9,
+    "Self-Made" = 9,
+    "Self Made" = 9,
+    // Customized = 10,
+    Strange = 11,
+    // Completed = 12,
+    Haunted = 13,
+    Collector = 14,
+    Collectors = 14,
+    "Collector's" = 14,
+    Decorated = 15,
+    paintkitweapon = 15,
+    DecoratedWeapon = 15,
+    "Decorated Weapon" = 15,
+};
+
+export default EQuality;
