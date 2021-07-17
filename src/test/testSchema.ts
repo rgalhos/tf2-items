@@ -5,7 +5,7 @@ import TestLog from "./utils";
 import { deepStrictEqual, strictEqual, throws } from "assert";
 import { EKillstreakTier } from "../enums/EKillstreak";
 
-const schema = new Schema(false);
+const schema = new Schema("steamApiKeyHere", false);
 
 schema.load().then(test);
 

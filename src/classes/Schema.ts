@@ -1,12 +1,7 @@
 import * as fs from "fs";
 import axios from "axios";
-import { fullNameToSku, skuToFullName as _skuToFullName, skuToItemObject as _skuToItemObject } from "../lib/sku";
+import * as skuUtils from "../lib/sku";
 const vdf = require("vdf");
-require("dotenv").config();
-
-if (!process.env.STEAM_WEBAPI_KEY) {
-    throw new Error("STEAM_WEBAPI_KEY is not defined in .env");
-}
 
 //const ITEMSGAME_URL = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt";
 const LOCALIZATION_TF_ENGLISH = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/resource/tf_english.txt";
@@ -19,13 +14,20 @@ export default class Schema {
     private readonly itemsByName = new Map<string, number>();
     private readonly unusualEffectsById = new Map<number, string>();
     private readonly unusualEffectsByName = new Map<string, number>();
+    private readonly steamApiKey: string;
     private rawSchemaOverview: any = {};
     private rawFullItemSchema: any = {};
     private rawItemsGame: any = {};
     private localization: any = {};
     private ready: boolean = false;
 
-    constructor(load: boolean = false) {
+    constructor(steamApiKey: string, load: boolean = false) {
+        if (!steamApiKey) {
+            throw new Error("no steam api key");
+        }
+
+        this.steamApiKey = steamApiKey;
+
         if (load) {
             this.load();
         }
@@ -51,7 +53,7 @@ export default class Schema {
         return new Promise((resolve, reject) => {
             axios.get(ITEMS_SCHEMA, {
                 params: {
-                    key: process.env.STEAM_WEBAPI_KEY,
+                    key: this.steamApiKey,
                     language: "english",
                     start: start
                 }
@@ -71,7 +73,8 @@ export default class Schema {
                 } else {
                     resolve(null);
                 }
-            });
+            })
+            .catch(reject);
         });
     }
 
@@ -87,9 +90,9 @@ export default class Schema {
 
     public loadLocalization() : Promise<void> {
         return new Promise((resolve, reject) => {
-            axios.get(LOCALIZATION_TF_ENGLISH).then(({ status, data }) => {
+            axios.get(LOCALIZATION_TF_ENGLISH).then(({ status, statusText, data }) => {
                 if (status !== 200) {
-                    return reject("failed to get localization: status code not 200");
+                    return reject(`failed to get localization: ${statusText} (${status})`);
                 }
 
                 this.localization = vdf.parse(data).lang.Tokens;
@@ -107,12 +110,12 @@ export default class Schema {
         return new Promise((resolve, reject) => {
             axios.get(SCHEMA_OVERVIEW_URL, {
                 params: {
-                    key: process.env.STEAM_WEBAPI_KEY,
+                    key: this.steamApiKey,
                     language: "english",
                 }
-            }).then(({ status, data: schemaOverview }) => {
+            }).then(({ status, statusText, data: schemaOverview }) => {
                 if (status !== 200) {
-                    return reject("failed to get schema overview: status code not 200");
+                    return reject(`failed to get schema overview: ${statusText} (${status})`);
                 }
 
                 schemaOverview = schemaOverview.result;
@@ -134,9 +137,9 @@ export default class Schema {
                 });
 
                 // List of items
-                axios.get(schemaOverview.items_game_url).then(({ status, data: items }) => {
+                axios.get(schemaOverview.items_game_url).then(({ status, statusText, data: items }) => {
                     if (status !== 200) {
-                        return reject("failed to get items_game: status code not 200");
+                        return reject(`failed to get items_game: ${statusText} (${status})`);
                     }
 
                     this.rawItemsGame = vdf.parse(items).items_game;
@@ -235,15 +238,15 @@ export default class Schema {
     }
 
     public getSkuFromFullName(fullName: string) {
-        return fullNameToSku(fullName, this);
+        return skuUtils.fullNameToSku(fullName, this);
     }
 
     public skuToItemObject(sku: string) {
-        return _skuToItemObject(sku, this);
+        return skuUtils.skuToItemObject(sku, this);
     }
 
     public skuToFullName(sku: string) {
-        return _skuToFullName(sku, this);
+        return skuUtils.skuToFullName(sku, this);
     }
 
     private clearMaps() {
