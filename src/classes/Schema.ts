@@ -214,7 +214,7 @@ export default class Schema {
     }
 
     public getItemNameByDefindex(defindex: number) {
-        return this.itemsByDefindex.get(defindex);
+        return this.itemsByDefindex.get(Number(defindex));
     }
 
     public getItemDefindexByName(name: string) {
@@ -222,11 +222,11 @@ export default class Schema {
     }
 
     public getRawItemNameByDefindex(defindex: number) {
-        return this.rawItemsByDefindex.get(defindex);
+        return this.rawItemsByDefindex.get(Number(defindex));
     }
 
     public getUnusualEffectById(id: number) {
-        return this.unusualEffectsById.get(id);
+        return this.unusualEffectsById.get(Number(id));
     }
 
     public getUnusualEffectByName(name: string) {
