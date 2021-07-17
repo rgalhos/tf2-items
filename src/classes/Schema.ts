@@ -54,7 +54,6 @@ export default class Schema {
 
     public loadItemSchema() : Promise<void> {
         return new Promise((resolve, reject) => {
-            console.dir(this.rawSchemaItems)
             if (!this.rawSchemaItems) {
                 return reject("item schema not loaded");
             }

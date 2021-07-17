@@ -1,4 +1,5 @@
 import Schema from "./classes/Schema";
+import testAttributes from "./test/testAttributes";
 import testSchema from "./test/testSchema";
 
 export default Schema;
@@ -9,4 +10,5 @@ if (argv[0] === "test") {
     const schema = new Schema(argv[1]);
 
     testSchema(schema);
+    testAttributes(schema);
 }
