@@ -154,7 +154,7 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
 
     // Unusualifier
     if (fullName.includes(" Unusualifier")) {
-        name = "Taunt Unusualifier";
+        name = "Unusualifier";
 
         let match = fullName.match(/Unusual (.*?) Unusualifier/);
         
@@ -298,7 +298,7 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
         }
 
         fullName.push(targetName as string, "Strangifier");
-    } else if (name === "Taunt Unusualifier") {
+    } else if (name === "Unusualifier") {
         if (!priceIndex && !targetName) {
             throw new Error("generic unusualifiers are not allowed");
         }

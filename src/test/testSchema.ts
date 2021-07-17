@@ -114,7 +114,7 @@ function test_skuToItemObject() {
         schema.skuToItemObject("9258;5;uncraftable;td-1182"),
         {
             sku: "9258;5;uncraftable;td-1182",
-            name: "Taunt Unusualifier",
+            name: "Unusualifier",
             fullName: "Non-Craftable Unusual Taunt: Yeti Punch Unusualifier",
             defindex: 9258,
             quality: EQuality.Unusual,

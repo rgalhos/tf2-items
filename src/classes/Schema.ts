@@ -26,7 +26,6 @@ export default class Schema {
     // Raw data
     private rawSchemaOverview: null | IRawSchemaOverview = null;
     private rawSchemaItems: null | IRawSchemaItems = null;
-    private rawItemsGame: any;
 
     private readonly steamApiKey: string;
     private ready: boolean = false;
@@ -43,16 +42,19 @@ export default class Schema {
         return this.ready;
     }
 
-    public load() {
-        return this.loadSchemaOverview().then(this.loadItemSchema.bind(this));
+    public async load() {
+        this.ready = false;
+
+        await this.loadSchemaOverview();
+        await this.downloadItemSchema();
+        await this.loadItemSchema();
+
+        this.ready = true;
     }
 
     public loadItemSchema() : Promise<void> {
-        if (!this.rawSchemaItems) {
-            return this.downloadItemSchema().then(this.loadItemSchema);
-        }
-
         return new Promise((resolve, reject) => {
+            console.dir(this.rawSchemaItems)
             if (!this.rawSchemaItems) {
                 return reject("item schema not loaded");
             }
@@ -157,43 +159,41 @@ export default class Schema {
             });
         });
     }
+    
+    private _downloadItemSchema(start = 0) : Promise<number | null> {
+        return new Promise((resolve, reject) => {
+            axios.get(SCHEMA_ITEMS, {
+                params: {
+                    key: this.steamApiKey,
+                    language: "english",
+                    start: start,
+                }
+            }).then(({ status, statusText, data }) => {
+                if (status !== 200) {
+                    return reject(`failed to get full item schema: status code not 200: ${statusText} (${status})`);
+                }
+
+                if (!this.rawSchemaItems) {
+                    this.rawSchemaItems = data.result;
+                } else {
+                    this.rawSchemaItems.items = this.rawSchemaItems.items.concat(data.result.items);
+                }
+
+                if (data.result.next) {
+                    resolve(data.result.next);
+                } else {
+                    resolve(null);
+                }
+            })
+            .catch(reject);
+        });
+    }
 
     public async downloadItemSchema() : Promise<void> {
-        const self = this;
-
-        function _downloadItemSchema(start = 0) : Promise<number | null> {
-            return new Promise((resolve, reject) => {
-                axios.get(SCHEMA_ITEMS, {
-                    params: {
-                        key: self.steamApiKey,
-                        language: "english",
-                        start: start,
-                    }
-                }).then(({ status, statusText, data }) => {
-                    if (status !== 200) {
-                        return reject(`failed to get full item schema: status code not 200: ${statusText} (${status})`);
-                    }
-    
-                    if (!self.rawItemsGame.hasOwnProperty("items")) {
-                        self.rawItemsGame = data.result;
-                    } else {
-                        self.rawItemsGame.items = self.rawItemsGame.items.concat(data.result.items);
-                    }
-    
-                    if (data.result.next) {
-                        resolve(data.result.next);
-                    } else {
-                        resolve(null);
-                    }
-                })
-                .catch(reject);
-            });
-        }
-
         let index: number | null = 0;
 
         while (index !== null)
-            index = await _downloadItemSchema(index);
+            index = await this._downloadItemSchema(index);
 
         return;
     }
