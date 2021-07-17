@@ -2,6 +2,7 @@ import EQuality from "../enums/EQuality";
 import IItemAttribute from "../interfaces/IItemAttribute";
 import ISchemaItem from "../interfaces/ISchemaItem";
 import ASchemaItem from "../interfaces/ASchemaItem";
+import * as itemAttributes from "../lib/attributes";
 
 export default class SchemaItem extends ASchemaItem {
     public name: string = super.name;
@@ -54,83 +55,67 @@ export default class SchemaItem extends ASchemaItem {
         }
     }
 
-    private _get(attrName: string) {
-        if (!this.attributes) {
-            return null;
-        }
-    
-        return this.getAttribute(attrName)?.value;
-    }
-
-    public getAttribute(attrName: string) : IItemAttribute | undefined {
-        return this.attributes?.find(({ class: _class }) => attrName === _class);
-    }
-
-    public getPaintColor() : number | { red: number, blu: number } | undefined {
-        const red = this._get("set_item_tint_rgb");
-        const blu = this._get("set_item_tint_rgb_2");
-    
-        if (!blu) return red;
-        else if (blu && red) return { red, blu };
+    public getPaintColor() {
+        return itemAttributes.getPaintColor(this);
     }
 
     public getCrateSeries() {
-        return this._get("supply_crate_series");
+        return itemAttributes.getCrateSeries(this);
     }
 
     public getCrateKey() {
-        return this._get("decoded_by_itemdefindex");
+        return itemAttributes.getCrateKey(this);
     }
 
     public isCrate() {
-        return this.item_class === "supply_crate";
+        return itemAttributes.isCrate(this);
     }
     
     public isKey() {
-        return !!(this?.tool?.type === "decoder_ring" && this?.tool?.usage_capabilities?.decodable === true);
+        return itemAttributes.isKey(this);
     }
     
     public isPaintCan() {
-        return this?.tool?.type === "paint_can";
+        return itemAttributes.isPaintCan(this);
     }
     
     public isUntradableByDefault() {
-        return this._get("cannot_trade") === 1;
+        return itemAttributes.isUntradableByDefault(this);
     }
     
     public isVoodooSoul() {
-        return this._get("zombiezombiezombiezombie") === 1;
+        return itemAttributes.isVoodooSoul(this);
     }
     
-    public isHalloweenItem() : number | false {
-        return this._get("halloween_item") || false;
+    public isHalloweenItem() {
+        return itemAttributes.isHalloweenItem(this);
     }
     
     public isNoiseMaker() {
-        return this?.tool?.type === "noise_maker";
+        return itemAttributes.isNoiseMaker(this);
     }
     
-    public isRestricted() : string | false {
-        return this?.tool?.restriction || false;
+    public isRestricted() {
+        return itemAttributes.isRestricted(this);
     }
     
     public isStrangifier()  {
-        return this?.tool?.type === "strangifier" && this?.tool?.usage_capabilities?.can_strangify === true;
+        return itemAttributes.isStrangifier(this);
     }
     
     public isStrangeFilter() {
-        return this?.tool?.type === "strange_part_restriction";
+        return itemAttributes.isStrangeFilter(this);
     }
     
     public isStrangePart() {
-        return this?.tool?.type === "strange_part";
+        return itemAttributes.isStrangePart(this);
     }
     
-    public hasHolidayRestriction() : string | false {
-        return this?.holiday_restriction || false;
+    public hasHolidayRestriction() {
+        return itemAttributes.hasHolidayRestriction(this);
     }
     
-    public getItemTarget() : number | undefined {
-        return this._get("tool_target_item");
+    public getItemTarget() {
+        return itemAttributes.getItemTarget(this);
     }
 }
