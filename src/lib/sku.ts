@@ -113,7 +113,7 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
 
     if (mayBeUnusual) {
         // can be either unique, unusual with effect or unusual with elevated quality
-        for (const effectName of schema.getAllUnusualEffects()) {
+        for (const [_id, effectName] of schema.getAllUnusualEffects()) {
             if (name.startsWith(effectName + ' ')) {
                 if (quality === EQuality.Strange) { // Special case: Unusual with elevated quality
                     elevatedStrange = true;
@@ -231,7 +231,7 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
 
     const defindex: number = Number(sku.shift());
     const quality: EQuality = Number(sku.shift());
-    const name = schema.getRawItemNameByDefindex(defindex);
+    const name = schema.getItemNameByDefindex(defindex);
 
     if (isNaN(defindex)) {
         throw new Error("no defindex");
@@ -278,7 +278,7 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
     }
 
     if (priceIndex) {
-        targetName = schema.getRawItemNameByDefindex(priceIndex) as string;
+        targetName = schema.getItemNameByDefindex(priceIndex) as string;
 
         if (!targetName) {
             throw new Error(`no item found for defindex "${priceIndex}" (target)`);
