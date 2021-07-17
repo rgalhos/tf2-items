@@ -92,8 +92,8 @@ export default class Schema {
                     }
                 }
                 
-                // Key
-                else if (itemAttributes.isKey(item)) {
+                // Key (excluding Mann Co.)
+                else if (itemAttributes.isKey(item) && defindex !== 5021) {
                     this._addItem(defindex, item.name, item);
                 }
                 
@@ -102,25 +102,10 @@ export default class Schema {
                     this._addItem(defindex, item.name, item);
                 }
                 
-                // Rest (excluding stock weapons)
-                else if (defindex > 30 && defindex !== 735 && defindex !== 1132) {
+                // Rest (excluding stock)
+                else if (item.item_quality !== EQuality.Normal) {
                     this._addItem(defindex, item_name, item);
                 }
-            }
-
-            //
-            // Special cases
-            //
-            // Items that need to be deleted
-            for (const [ id, name ] of [
-                [ 2093, "Name Tag For Bundles" ],
-                /*
-                [ 27, "Construction PDA" ],
-                [ 735, "Sapper" ],
-                [ 1132, "Spellbook Magazine" ],
-                */
-            ]) {
-                this._deleteItem(id as number, name as string);
             }
 
             resolve();
@@ -247,7 +232,7 @@ export default class Schema {
     }
 
     public getUnusualEffectByName(name: string) {
-        return this.effectsByName.get(name);
+        return this.effectsByName.get(normalizeName(name));
     }
 
     public getAllUnusualEffects() {

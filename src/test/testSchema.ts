@@ -5,11 +5,15 @@ import TestLog from "./utils";
 import { deepStrictEqual, strictEqual, throws } from "assert";
 import { EKillstreakTier } from "../enums/EKillstreak";
 
-const schema = new Schema("steamApiKeyHere");
+var schema: Schema;
 
-schema.load().then(test);
+export default function testSchema(_schema: Schema) {
+    schema = _schema;
+    
+    schema.load().then(startTest);
+}
 
-function test() {
+function startTest() {
     if (!schema.isReady) {
         throw new Error("promise resolved too early");
     } else if (schema.getAllUnusualEffects().length === 0) {
