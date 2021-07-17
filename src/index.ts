@@ -35,23 +35,9 @@ export { ISchemaItem };
 import testAttributes from "./test/testAttributes";
 import testSchema from "./test/testSchema";
 
-import readline from "readline";
-
 if (process.argv[2] === "test") {
     const schema = new Schema(process.argv[3]);
 
     testSchema(schema);
     testAttributes(schema);
-
-    readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    }).on("line", line => {
-        try {
-            let ev = eval(line);
-            console.dir(ev);
-        } catch (e) {
-            console.error(e);
-        }
-    });
 }
