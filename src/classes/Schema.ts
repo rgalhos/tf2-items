@@ -6,7 +6,7 @@ import IRawSchemaOverview from "../interfaces/IRawSchemaOverview";
 import IRawSchemaItems from "../interfaces/IRawSchemaItems";
 import ISchemaItem from "../interfaces/ISchemaItem";
 import EQuality from "../enums/EQuality";
-const vdf = require("vdf");
+import SchemaItem from "./SchemaItem";
 
 const ITEMSGAME_URL = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/scripts/items/items_game.txt";
 const LOCALIZATION_TF_ENGLISH = "https://raw.githubusercontent.com/SteamDatabase/GameTracking-TF2/master/tf/resource/tf_english.txt";
@@ -17,7 +17,7 @@ export default class Schema {
     // Items
     private readonly itemsByDefindex = new Map<number, string>();
     private readonly itemsByName = new Map<string, number>();
-    private readonly itemSchema = new Map<number, ISchemaItem>();
+    private readonly itemSchema = new Map<number, SchemaItem>();
 
     // Unusual effects
     private readonly effectsById = new Map<number, string>();
@@ -34,6 +34,8 @@ export default class Schema {
         if (!steamApiKey) {
             throw new Error("no steam api key");
         }
+
+        Object.defineProperty(this, "steamApiKey", { configurable: true, enumerable: false });
 
         this.steamApiKey = steamApiKey;
     }
@@ -257,7 +259,7 @@ export default class Schema {
     private _addItem(defindex: number, name: string, item: ISchemaItem) {
         this.itemsByDefindex.set(defindex, name);
         this.itemsByName.set(normalizeName(name), defindex);
-        this.itemSchema.set(defindex, item);
+        this.itemSchema.set(defindex, new SchemaItem(item));
     }
 
     private _addUnusualEffect(id: number, name: string) {

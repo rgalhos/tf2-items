@@ -1,7 +1,6 @@
 import Schema from "../classes/Schema";
-import * as itemAttribute from "../lib/attributes";
 import { deepStrictEqual, strictEqual } from "assert";
-import ISchemaItem from "../interfaces/ISchemaItem";
+import SchemaItem from "../classes/SchemaItem";
 
 var schema: Schema;
 
@@ -27,139 +26,139 @@ function startTest() {
 
 function testPaints() {
     // Team Spirit
-    const teamSpirit = schema.getItemSchema(5046) as ISchemaItem;
+    const teamSpirit = schema.getItemSchema(5046) as SchemaItem;
 
     strictEqual(teamSpirit.tool?.usage_capabilities?.paintable_team_colors, true);
-    strictEqual(itemAttribute.isPaintCan(teamSpirit), true);
-    deepStrictEqual(itemAttribute.getPaintColor(teamSpirit), { red: 12073019, blu: 5801378 });
+    strictEqual(teamSpirit.isPaintCan(), true);
+    deepStrictEqual(teamSpirit.getPaintColor(), { red: 12073019, blu: 5801378 });
 
     // Mann Co. Orange
-    const orange = schema.getItemSchema(5032) as ISchemaItem;
+    const orange = schema.getItemSchema(5032) as SchemaItem;
 
     strictEqual(orange.tool?.usage_capabilities?.paintable, true);
-    strictEqual(itemAttribute.isPaintCan(orange), true);
-    strictEqual(itemAttribute.getPaintColor(orange), 13595446);
+    strictEqual(orange.isPaintCan(), true);
+    strictEqual(orange.getPaintColor(), 13595446);
 
     // Pink as Hell
-    const pink = schema.getItemSchema(5051) as ISchemaItem;
+    const pink = schema.getItemSchema(5051) as SchemaItem;
 
     strictEqual(pink.tool?.usage_capabilities?.paintable, true);
-    strictEqual(itemAttribute.isPaintCan(pink), true);
-    strictEqual(itemAttribute.getPaintColor(pink), 16738740);
+    strictEqual(pink.isPaintCan(), true);
+    strictEqual(pink.getPaintColor(), 16738740);
 }
 
 function testCrates() {
     // Naughty Winter Crate 2011
-    const naughty2011 = schema.getItemSchema(5070) as ISchemaItem;
+    const naughty2011 = schema.getItemSchema(5070) as SchemaItem;
 
-    strictEqual(itemAttribute.isCrate(naughty2011), true);
-    strictEqual(itemAttribute.getCrateSeries(naughty2011), 35);
-    strictEqual(itemAttribute.getCrateKey(naughty2011), undefined);
-    strictEqual(itemAttribute.isRestricted(naughty2011), "winter2011_naughty");
+    strictEqual(naughty2011.isCrate(), true);
+    strictEqual(naughty2011.getCrateSeries(), 35);
+    strictEqual(naughty2011.getCrateKey(), null);
+    strictEqual(naughty2011.isRestricted(), "winter2011_naughty");
 
     // Gun Mettle Cosmetic Case
-    const gunMettle = schema.getItemSchema(5817) as ISchemaItem;
+    const gunMettle = schema.getItemSchema(5817) as SchemaItem;
 
-    strictEqual(itemAttribute.isCrate(gunMettle), true);
-    // strictEqual(itemAttribute.getCrateSeries(gunMettle), 35);
-    strictEqual(itemAttribute.getCrateKey(gunMettle), undefined);
-    strictEqual(itemAttribute.isRestricted(gunMettle), "gunmettlecosmetic2015");
+    strictEqual(gunMettle.isCrate(), true);
+    // strictEqual(gunMettle.getCrateSeries(), 35);
+    strictEqual(gunMettle.getCrateKey(), null);
+    strictEqual(gunMettle.isRestricted(), "gunmettlecosmetic2015");
 
     // Salvaged
-    const salvaged = schema.getItemSchema(5068) as ISchemaItem;
+    const salvaged = schema.getItemSchema(5068) as SchemaItem;
 
-    strictEqual(itemAttribute.isCrate(salvaged), true);
-    strictEqual(itemAttribute.getCrateSeries(salvaged), 50);
-    strictEqual(itemAttribute.getCrateKey(salvaged), 5021);
-    strictEqual(itemAttribute.isRestricted(salvaged), false);
+    strictEqual(salvaged.isCrate(), true);
+    strictEqual(salvaged.getCrateSeries(), 50);
+    strictEqual(salvaged.getCrateKey(), 5021);
+    strictEqual(salvaged.isRestricted(), false);
 }
 
 function testKeys() {
     // Normal
-    const normal = schema.getItemSchema(5021) as ISchemaItem;
+    const normal = schema.getItemSchema(5021) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(normal), true);
-    strictEqual(itemAttribute.isRestricted(normal), false);
+    strictEqual(normal.isKey(), true);
+    strictEqual(normal.isRestricted(), false);
 
 
     // Scream Fortress 2018 War Paint Key
-    const sf18 = schema.getItemSchema(5898) as ISchemaItem;
+    const sf18 = schema.getItemSchema(5898) as SchemaItem;
     
-    strictEqual(itemAttribute.isKey(sf18), true);
-    strictEqual(itemAttribute.isRestricted(sf18), "halloween2018paintkit");
+    strictEqual(sf18.isKey(), true);
+    strictEqual(sf18.isRestricted(), "halloween2018paintkit");
 
     // Summer 2020 Cosmetic Key
-    const summer2020 = schema.getItemSchema(5913) as ISchemaItem;
-    strictEqual(itemAttribute.isKey(summer2020), true);
-    strictEqual(itemAttribute.isRestricted(summer2020), "summer2020");
+    const summer2020 = schema.getItemSchema(5913) as SchemaItem;
+    strictEqual(summer2020.isKey(), true);
+    strictEqual(summer2020.isRestricted(), "summer2020");
 }
 
 function testHats() {
     // Slick Cut
-    const slickCut = schema.getItemSchema(30187) as ISchemaItem;
+    const slickCut = schema.getItemSchema(30187) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(slickCut), false);
-    strictEqual(itemAttribute.isCrate(slickCut), false);
-    strictEqual(itemAttribute.isRestricted(slickCut), false);
-    strictEqual(itemAttribute.isUntradableByDefault(slickCut), false);
+    strictEqual(slickCut.isKey(), false);
+    strictEqual(slickCut.isCrate(), false);
+    strictEqual(slickCut.isRestricted(), false);
+    strictEqual(slickCut.isUntradableByDefault(), false);
     deepStrictEqual(slickCut.used_by_classes, [ "Medic" ]);
 
     // Team Captain
-    const tc = schema.getItemSchema(378) as ISchemaItem;
+    const tc = schema.getItemSchema(378) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(tc), false);
-    strictEqual(itemAttribute.isCrate(tc), false);
-    strictEqual(itemAttribute.isRestricted(tc), false);
-    strictEqual(itemAttribute.isUntradableByDefault(tc), false);
+    strictEqual(tc.isKey(), false);
+    strictEqual(tc.isCrate(), false);
+    strictEqual(tc.isRestricted(), false);
+    strictEqual(tc.isUntradableByDefault(), false);
     deepStrictEqual(tc.used_by_classes, [ "Soldier", "Medic", "Heavy" ]);
     strictEqual(tc.item_description, "Our lawyers say 'YES! YES!'");
 
     // Voodoo-Cursed Pyro Soul
-    const soul = schema.getItemSchema(5624) as ISchemaItem;
+    const soul = schema.getItemSchema(5624) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(soul), false);
-    strictEqual(itemAttribute.isCrate(soul), false);
-    strictEqual(itemAttribute.isRestricted(soul), false);
-    strictEqual(itemAttribute.hasHolidayRestriction(soul), "halloween_or_fullmoon");
-    strictEqual(itemAttribute.isVoodooSoul(soul), true);
-    strictEqual(itemAttribute.isNoiseMaker(soul), false);
+    strictEqual(soul.isKey(), false);
+    strictEqual(soul.isCrate(), false);
+    strictEqual(soul.isRestricted(), false);
+    strictEqual(soul.hasHolidayRestriction(), "halloween_or_fullmoon");
+    strictEqual(soul.isVoodooSoul(), true);
+    strictEqual(soul.isNoiseMaker(), false);
 }
 
 function testMisc() {
     // Strange Part: Robots Destroyed
-    const strangepart = schema.getItemSchema(6026) as ISchemaItem;
+    const strangepart = schema.getItemSchema(6026) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(strangepart), false);
-    strictEqual(itemAttribute.isCrate(strangepart), false);
-    strictEqual(itemAttribute.isRestricted(strangepart), false);
-    strictEqual(itemAttribute.hasHolidayRestriction(strangepart), false);
-    strictEqual(itemAttribute.isVoodooSoul(strangepart), false);
-    strictEqual(itemAttribute.isStrangePart(strangepart), true);
-    strictEqual(itemAttribute.isStrangeFilter(strangepart), false);
-    strictEqual(itemAttribute.isNoiseMaker(strangepart), false);
+    strictEqual(strangepart.isKey(), false);
+    strictEqual(strangepart.isCrate(), false);
+    strictEqual(strangepart.isRestricted(), false);
+    strictEqual(strangepart.hasHolidayRestriction(), false);
+    strictEqual(strangepart.isVoodooSoul(), false);
+    strictEqual(strangepart.isStrangePart(), true);
+    strictEqual(strangepart.isStrangeFilter(), false);
+    strictEqual(strangepart.isNoiseMaker(), false);
 
     // Strange Filter: Turbine (Community)
-    const strangefilter = schema.getItemSchema(6507) as ISchemaItem;
+    const strangefilter = schema.getItemSchema(6507) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(strangefilter), false);
-    strictEqual(itemAttribute.isCrate(strangefilter), false);
-    strictEqual(itemAttribute.isRestricted(strangefilter), false);
-    strictEqual(itemAttribute.hasHolidayRestriction(strangefilter), false);
-    strictEqual(itemAttribute.isVoodooSoul(strangefilter), false);
-    strictEqual(itemAttribute.isStrangePart(strangefilter), false);
-    strictEqual(itemAttribute.isStrangeFilter(strangefilter), true);
-    strictEqual(itemAttribute.isNoiseMaker(strangefilter), false);
+    strictEqual(strangefilter.isKey(), false);
+    strictEqual(strangefilter.isCrate(), false);
+    strictEqual(strangefilter.isRestricted(), false);
+    strictEqual(strangefilter.hasHolidayRestriction(), false);
+    strictEqual(strangefilter.isVoodooSoul(), false);
+    strictEqual(strangefilter.isStrangePart(), false);
+    strictEqual(strangefilter.isStrangeFilter(), true);
+    strictEqual(strangefilter.isNoiseMaker(), false);
 
     // Noise maker
-    const noisemaker = schema.getItemSchema(536) as ISchemaItem;
+    const noisemaker = schema.getItemSchema(536) as SchemaItem;
 
-    strictEqual(itemAttribute.isKey(noisemaker), false);
-    strictEqual(itemAttribute.isCrate(noisemaker), false);
-    strictEqual(itemAttribute.isRestricted(noisemaker), false);
-    strictEqual(itemAttribute.hasHolidayRestriction(noisemaker), "birthday");
-    strictEqual(itemAttribute.isVoodooSoul(noisemaker), false);
-    strictEqual(itemAttribute.isStrangePart(noisemaker), false);
-    strictEqual(itemAttribute.isStrangeFilter(noisemaker), false);
-    strictEqual(itemAttribute.isNoiseMaker(noisemaker), true);
-    strictEqual(itemAttribute.isUntradableByDefault(noisemaker), true);
+    strictEqual(noisemaker.isKey(), false);
+    strictEqual(noisemaker.isCrate(), false);
+    strictEqual(noisemaker.isRestricted(), false);
+    strictEqual(noisemaker.hasHolidayRestriction(), "birthday");
+    strictEqual(noisemaker.isVoodooSoul(), false);
+    strictEqual(noisemaker.isStrangePart(), false);
+    strictEqual(noisemaker.isStrangeFilter(), false);
+    strictEqual(noisemaker.isNoiseMaker(), true);
+    strictEqual(noisemaker.isUntradableByDefault(), true);
 }
