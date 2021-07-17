@@ -30,9 +30,8 @@ function testPaints() {
     const teamSpirit = schema.getItemSchema(5046) as ISchemaItem;
 
     strictEqual(teamSpirit.tool?.usage_capabilities?.paintable_team_colors, true);
-
     strictEqual(itemAttribute.isPaintCan(teamSpirit), true);
-    strictEqual(itemAttribute.getPaintColor(teamSpirit), { red: 12073019, blu: 5801378 });
+    deepStrictEqual(itemAttribute.getPaintColor(teamSpirit), { red: 12073019, blu: 5801378 });
 
     // Mann Co. Orange
     const orange = schema.getItemSchema(5032) as ISchemaItem;
@@ -42,7 +41,7 @@ function testPaints() {
     strictEqual(itemAttribute.getPaintColor(orange), 13595446);
 
     // Pink as Hell
-    const pink = schema.getItemSchema(5032) as ISchemaItem;
+    const pink = schema.getItemSchema(5051) as ISchemaItem;
 
     strictEqual(pink.tool?.usage_capabilities?.paintable, true);
     strictEqual(itemAttribute.isPaintCan(pink), true);
@@ -113,7 +112,7 @@ function testHats() {
     strictEqual(itemAttribute.isRestricted(tc), false);
     strictEqual(itemAttribute.isUntradableByDefault(tc), false);
     deepStrictEqual(tc.used_by_classes, [ "Soldier", "Medic", "Heavy" ]);
-    strictEqual(tc.item_description, "Our lawyers say 'YES! YES!");
+    strictEqual(tc.item_description, "Our lawyers say 'YES! YES!'");
 
     // Voodoo-Cursed Pyro Soul
     const soul = schema.getItemSchema(5624) as ISchemaItem;

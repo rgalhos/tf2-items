@@ -46,7 +46,7 @@ export function isKey(item: ISchemaItem) {
 }
 
 export function isPaintCan(item: ISchemaItem) {
-    return !!(item?.tool?.type === "paint_can" && item?.tool?.usage_capabilities?.paintable === true);
+    return item?.tool?.type === "paint_can";
 }
 
 export function isUntradableByDefault(item: ISchemaItem) {
