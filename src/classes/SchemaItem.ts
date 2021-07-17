@@ -1,5 +1,4 @@
 import EQuality from "../enums/EQuality";
-import IItemAttribute from "../interfaces/IItemAttribute";
 import ISchemaItem from "../interfaces/ISchemaItem";
 import ASchemaItem from "../interfaces/ASchemaItem";
 import * as itemAttributes from "../lib/attributes";

@@ -1,7 +1,7 @@
 import EQuality from "../enums/EQuality"
 import IItemAttribute from "./IItemAttribute";
 
-export default abstract class ISchemaItem {
+export default abstract class ISchemaItem implements ISchemaItem {
     public name: string = "";
     public defindex: number = 0;
     public item_class?: string;
