@@ -235,6 +235,10 @@ export default class Schema {
         return this.effectsByName.get(normalizeName(name));
     }
 
+    public getItemSchema(defindex: number) {
+        return this.itemSchema.get(Number(defindex));
+    }
+
     public getAllUnusualEffects() {
         return Array.from(this.effectsById.entries());
     }
