@@ -99,9 +99,29 @@ export default class Schema {
                 else if (item.item_quality === EQuality.DecoratedWeapon) {
                     this._addItem(defindex, item.name, item);
                 }
-
-                this._addItem(defindex, item_name, item);
+                
+                // Rest (excluding stock weapons)
+                else if (defindex > 30 && defindex !== 735 && defindex !== 1132) {
+                    this._addItem(defindex, item_name, item);
+                }
             }
+
+            //
+            // Special cases
+            //
+            // Items that need to be deleted
+            for (const [ id, name ] of [
+                [ 2093, "Name Tag For Bundles" ],
+                /*
+                [ 27, "Construction PDA" ],
+                [ 735, "Sapper" ],
+                [ 1132, "Spellbook Magazine" ],
+                */
+            ]) {
+                this._deleteItem(id as number, name as string);
+            }
+
+            resolve();
         });
     }
 
@@ -255,6 +275,11 @@ export default class Schema {
     private _addUnusualEffect(id: number, name: string) {
         this.effectsById.set(id, name);
         this.effectsByName.set(normalizeName(name), id);
+    }
+
+    private _deleteItem(defindex: number, name: string) {
+        this.itemsByDefindex.delete(defindex);
+        this.itemsByName.delete(normalizeName(name));
     }
 }
 
