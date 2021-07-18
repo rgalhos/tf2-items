@@ -4,53 +4,21 @@ import ASchemaItem from "../interfaces/ASchemaItem";
 import * as itemAttributes from "../lib/attributes";
 
 export default class SchemaItem extends ASchemaItem {
-    public name: string = super.name;
-    public defindex: number = super.defindex;
-    public item_name: string = super.item_name;
-    public proper_name: boolean = super.proper_name;
-    public model_player: string | null = super.model_player;
-    public item_quality: EQuality | 255 = super.item_quality;
-    public image_inventory: string | null = super.image_inventory;
-    public min_ilevel: number = super.min_ilevel;
-    public max_ilevel: number = super.max_ilevel;
-    public image_url: string | null = super.image_url;
-    public image_url_large: string | null = super.image_url_large;
-    public craft_class: string = super.craft_class;
-    public craft_material_type: string = super.craft_material_type;
-    public used_by_classes = super.used_by_classes;
-    public capabilities = super.capabilities;
-
     constructor(item: ISchemaItem) {
         super();
 
         Object.assign(this, item);
 
-        for (const func of [
-            "_get",
-            "getAttribute",
-            "getPaintColor",
-            "getCrateSeries",
-            "getCrateKey",
-            "isCrate",
-            "isKey",
-            "isPaintCan",
-            "isUntradableByDefault",
-            "isVoodooSoul",
-            "isHalloweenItem",
-            "isNoiseMaker",
-            "isRestricted",
-            "isStrangifier",
-            "isStrangeFilter",
-            "isStrangePart",
-            "hasHolidayRestriction",
-            "getItemTarget"
-        ]) {
-            Object.defineProperty(this, func, {
-                configurable: false,
-                enumerable: false,
-                // @ts-ignore
-                value: this[func],
-            })
+        for (const key of Object.keys(this)) {
+            // @ts-ignore
+            if (typeof this[key] === "function") {
+                Object.defineProperty(this, key, {
+                    configurable: false,
+                    enumerable: false,
+                    // @ts-ignore
+                    value: this[key],
+                });
+            }
         }
     }
 

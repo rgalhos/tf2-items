@@ -2,6 +2,8 @@ import EQuality from "../enums/EQuality"
 import IItemAttribute from "./IItemAttribute";
 
 export default interface ISchemaItem {
+    fullName: string; // Custom key
+    
     name: string,
     defindex: number,
     item_class?: string,

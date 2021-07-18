@@ -3,6 +3,8 @@ import IItemAttribute from "./IItemAttribute";
 import ISchemaItem from "./ISchemaItem";
 
 export default abstract class ASchemaItem implements ISchemaItem {
+    public fullName: string = ""; // Custom key
+    
     public name: string = "";
     public defindex: number = 0;
     public item_class?: string;

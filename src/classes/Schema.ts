@@ -35,9 +35,13 @@ export default class Schema {
             throw new Error("no steam api key");
         }
 
-        Object.defineProperty(this, "steamApiKey", { configurable: true, enumerable: false });
-
         this.steamApiKey = steamApiKey;
+
+        Object.defineProperty(this, "steamApiKey", {
+            configurable: true,
+            enumerable: false,
+            value: steamApiKey
+        });
     }
 
     public get isReady() : boolean {
@@ -257,6 +261,7 @@ export default class Schema {
     }
 
     private _addItem(defindex: number, name: string, item: ISchemaItem) {
+        item.fullName = name;
         this.itemsByDefindex.set(defindex, name);
         this.itemsByName.set(normalizeName(name), defindex);
         this.itemSchema.set(defindex, new SchemaItem(item));
