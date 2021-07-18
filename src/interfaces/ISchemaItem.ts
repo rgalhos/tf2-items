@@ -19,11 +19,11 @@ export default interface ISchemaItem {
     max_ilevel: number,
     image_url: string | null,
     image_url_large: string | null,
-    drop_type?: string,
+    drop_type?: drop_type_t,
     item_set?: string,
-    craft_class: string,
-    craft_material_type: string,
-    holiday_restriction?: string,
+    craft_class: craft_class_t,
+    craft_material_type: craft_material_type_t,
+    holiday_restriction?: holiday_restriction_t,
     capabilities: {
         usable_gc?: boolean,
         usable_out_of_game?: boolean,
@@ -50,15 +50,18 @@ export default interface ISchemaItem {
         restriction?: string,
         usage_capabilities?: {
             decodable?: boolean,
+            nameable?: boolean,
             paintable?: boolean,
             paintable_team_colors?: boolean,
             strange_parts?: boolean,
+            can_card_upgrade?: boolean,
             can_customize_texture?: boolean,
             can_gift_wrap?: boolean,
             can_consume?: boolean,
             can_strangify?: boolean,
             can_killstreakify?: boolean,
             can_unusualify?: boolean,
+            duck_upgradable?: boolean,
         },
     },
     styles?: {
@@ -68,4 +71,8 @@ export default interface ISchemaItem {
     attributes?: IItemAttribute[],
 };
 
-type Classes = "Scout" | "Soldier" | "Pyro" | "Demoman" | "Heavy" | "Engineer" | "Medic" | "Sniper" | "Spy";
+export type Classes = "Scout" | "Soldier" | "Pyro" | "Demoman" | "Heavy" | "Engineer" | "Medic" | "Sniper" | "Spy";
+export type drop_type_t = "none" | "drop";
+export type craft_class_t = "" | "weapon" | "hat" | "craft_bar" | "haunted_hat" | "tool" | "craft_token" | "supply_crate";
+export type craft_material_type_t = "" | "weapon" | "hat" | "craft_bar" | "haunted_hat" | "tool" | "craft_token" | "supply_crate" | "craft_material_burned" | "craft_material_voodoocursed" | "strangepart";
+export type holiday_restriction_t = "halloween_or_fullmoon" | "birthday" | "christmas" | "halloween";

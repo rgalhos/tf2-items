@@ -32,7 +32,7 @@ export function getCrateKey(item: ISchemaItem) {
 }
 
 export function isCrate(item: ISchemaItem) {
-    return item.item_class === "supply_crate";
+    return item.item_class === "supply_crate" || keyLessCratesDefindexes.indexOf(item.defindex) !== -1;
 }
 
 export function isKey(item: ISchemaItem) {
@@ -87,3 +87,24 @@ export function getItemTarget(item: ISchemaItem) : number | null {
     return _getValue("tool_target_item", item);
 }
 
+const keyLessCratesDefindexes = [
+    5763, // Unlocked Creepy Scout Crate
+    5764, // Unlocked Creepy Pyro Crate
+    5765, // Unlocked Creepy Heavy Crate
+    5766, // Unlocked Creepy Engineer Crate
+    5767, // Unlocked Creepy Spy Crate
+    5768, // Unlocked Creepy Sniper Crate
+    5769, // Unlocked Creepy Soldier Crate
+    5770, // Unlocked Creepy Medic Crate
+    5771, // Unlocked Creepy Demo Crate
+    5850, // Unlocked Cosmetic Crate Scout
+    5851, // Unlocked Cosmetic Crate Sniper
+    5852, // Unlocked Cosmetic Crate Soldier
+    5853, // Unlocked Cosmetic Crate Demo
+    5854, // Unlocked Cosmetic Crate Medic
+    5855, // Unlocked Cosmetic Crate Heavy
+    5856, // Unlocked Cosmetic Crate Pyro
+    5857, // Unlocked Cosmetic Crate Spy
+    5858, // Unlocked Cosmetic Crate Engineer
+    5860, // Unlocked Cosmetic Crate Multi-Class
+];

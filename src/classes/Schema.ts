@@ -86,14 +86,16 @@ export default class Schema {
                 }
 
                 // Crate
-                else if (item.item_class === "supply_crate") {
-                    // Cases
-                    if (item_name.includes(" Case")) {
-                        this._addItem(defindex, item_name, item);
-                    }
+                else if (itemAttributes.isCrate(item)) {
+                    let series = itemAttributes.getCrateSeries(item);
+                    
                     // Crates with series number
+                    if (series) {
+                        this._addItem(defindex, item_name + " #" + series, item);
+                    }
+                    // Cases
                     else {
-                        this._addItem(defindex, item_name + " #" + itemAttributes.getCrateSeries(item), item);
+                        this._addItem(defindex, item_name, item);
                     }
                 }
                 
@@ -102,13 +104,17 @@ export default class Schema {
                     this._addItem(defindex, item.name, item);
                 }
                 
-                // Skins
-                else if (item.item_quality === EQuality.DecoratedWeapon) {
-                    this._addItem(defindex, item.name, item);
+                // Exclude stock items
+                else if (item.item_quality === EQuality.Normal) {
+                    //
                 }
                 
-                // Rest (excluding stock)
-                else if (item.item_quality !== EQuality.Normal) {
+                // Ignore "The " prefix
+                else if (item.proper_name && !item.name.startsWith("The ")) {
+                    this._addItem(defindex, item.name, item);
+                }
+
+                else {
                     this._addItem(defindex, item_name, item);
                 }
             }
@@ -289,3 +295,8 @@ function normalizeName(str: string) : string {
         .trim()
     ;
 }
+
+const defindexesOfCratesWithoutSeries = [
+    // Stockpile A and B
+    5737, 3738,
+];
