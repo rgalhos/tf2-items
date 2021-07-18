@@ -22,6 +22,10 @@ export default class SchemaItem extends ASchemaItem {
         }
     }
 
+    public getAttribute(attrName: string) {
+        return itemAttributes.getAttribute(attrName, this?.attributes || []);
+    }
+
     public getPaintColor() {
         return itemAttributes.getPaintColor(this);
     }
