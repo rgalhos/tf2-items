@@ -49,6 +49,10 @@ export default class SchemaItem extends ASchemaItem {
     public isUntradableByDefault() {
         return itemAttributes.isUntradableByDefault(this);
     }
+
+    public isAlwaysTradable() {
+        return itemAttributes.isAlwaysTradable(this);
+    }
     
     public isVoodooSoul() {
         return itemAttributes.isVoodooSoul(this);

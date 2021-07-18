@@ -47,6 +47,10 @@ export function isUntradableByDefault(item: ISchemaItem) {
     return _getValue("cannot_trade", item) === 1;
 }
 
+export function isAlwaysTradable(item: ISchemaItem) {
+    return _getValue("always_tradable", item) === 1;
+}
+
 export function isVoodooSoul(item: ISchemaItem) {
     return _getValue("zombiezombiezombiezombie", item) === 1;
 }
