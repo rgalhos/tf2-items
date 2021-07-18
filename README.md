@@ -65,8 +65,8 @@ Returns an `ISchemaItem`. Throws an error if not found.
 As funções desta classe não são enumeradas, então é possível iterar sobre as propriedades como se fosse um `ISchemaItem`.
 
 ## Properties
-| Property      | Type          | Description  |
-| ------------- | ------------- | ----- |
+| Property &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  | Type          | Description  |
+| ------------------------------------------ | ------------- | ----- |
 | fullName | string | Nome completo do item |
 | name | string | Internal item name |
 | item_name | string | Item name |
