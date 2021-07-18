@@ -5,28 +5,22 @@ export function getAttribute(attrName: string, attributes: IItemAttribute[]) : I
     return attributes.find(({ class: _class }) => attrName === _class);
 }
 
-function _get(attrName: string, item: ISchemaItem) : any | undefined {
-    if (!item || !item.attributes) {
+function _getValue(attrName: string, item: ISchemaItem) : number | null {
+    if (!item || !item.attributes)
         return null;
-    }
-
-    return getAttribute(attrName, item.attributes);
+        
+    return getAttribute(attrName, item.attributes)?.value || null;
 }
 
-function _getValue(attrName: string, item: ISchemaItem) : any | undefined {
-    return _get(attrName, item)?.value;
-}
 
-function _getFloat(attrName: string, item: ISchemaItem) : any | undefined {
-    return _get(attrName, item)?.float_value;
-}
-
-export function getPaintColor(item: ISchemaItem) : number | { red: number, blu: number } | undefined {
+export function getPaintColor(item: ISchemaItem) : number | { red: number, blu: number } | null {
     const red = _getValue("set_item_tint_rgb", item);
     const blu = _getValue("set_item_tint_rgb_2", item);
 
-    if (!blu) return red;
+    if (!blu) return red as number;
     else if (blu && red) return { red, blu };
+
+    return null;
 }
 
 export function getCrateSeries(item: ISchemaItem) {
@@ -85,7 +79,7 @@ export function hasHolidayRestriction(item: ISchemaItem) : string | false {
     return item?.holiday_restriction || false;
 }
 
-export function getItemTarget(item: ISchemaItem) : number | undefined {
+export function getItemTarget(item: ISchemaItem) : number | null {
     return _getValue("tool_target_item", item);
 }
 
