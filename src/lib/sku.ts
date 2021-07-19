@@ -3,7 +3,12 @@ import { EKillstreakTier } from "../enums/EKillstreak";
 import EQuality from "../enums/EQuality";
 import IObjectItem from "../interfaces/IObjectItem";
 
-// type SKU = '/\d+;\d+(;uncraftable)?(;untradeable)?(;australium)?(;festive)?(;kt-(1|2|3))?(;u\d+)?(;p\d+)?(;td-\d+)?/';
+// const sku_regExp = /\d+;\d+(;uncraftable)?(;untradable)?(;australium)?(;festive)?(;strange)?(;kt-(1|2|3))?(;u\d+)?(;p\d{7,8})?(;td-\d+)?$/;
+export const sku_regExp = /^(\d+);([0-9]|[1][0-5])(;((uncraftable)|(untrad(e)?able)|(australium)|(festive)|(strange)|((u|pk|td-|c|od-|oq-|p)\d+)|(w[1-5])|(kt-[1-3])|(n((100)|[1-9]\d?))))*?$/
+
+export function testSku(sku: string) {
+    return sku_regExp.test(sku);
+}
 
 export function fullNameToSku(fullName: string, schema: Schema) : string {
     let name = fullName;
@@ -227,6 +232,10 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
 }
 
 export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
+    if (!testSku(_sku)) {
+        throw new Error("invalid sku");
+    }
+
     let sku: string[] = _sku.split(';');
 
     const defindex: number = Number(sku.shift());
@@ -252,13 +261,18 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
     let priceIndex: number | null = null;
     let targetName: string | null = null;
     let paint: string | null = null;
+    let paintKitId: number | null = null;
+    let crateSeries: number | null = null;
+    let outputDefindex: number | null = null;
+    let outputQuality: number | null = null;
+    let craftNo: number | null = null;
     let fullName: string[] = [];
 
     let s;
     while (s = sku.shift()) {
         if (s === "uncraftable") {
             craftable = false;
-        } else if (s === "untradable") {
+        } else if (/untrad(e)?able/.test(s)) {
             untradable = true;
         } else if (s === "australium") {
             australium = true;
@@ -270,10 +284,20 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
             ksTier = Number(s.substr(3));
         } else if (/u\d+/.test(s)) {
             effectId = Number(s.substr(1));
-        } else if (/p\d{7,8}/.test(s)) {
+        } else if (/p\d+/.test(s)) {
             paint = s.substr(1);
         } else if (/td\-\d+/.test(s)) {
             priceIndex = Number(s.substr(3));
+        } else if (/pk\d+/.test(s)) {
+            paintKitId = Number(s.substr(2));
+        } else if (/c\d+/.test(s)) {
+            crateSeries = Number(s.substr(1));
+        } else if (/od-\d+/.test(s)) {
+            outputDefindex = Number(s.substr(3));
+        } else if (/oq-\d+/.test(s)) {
+            outputQuality = Number(s.substr(3));
+        } else if (/n\d+/.test(s)) {
+            craftNo = Number(s.substr(1));
         }
     }
 
@@ -364,6 +388,12 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
         effectId: effectId,
         effectName: effectName,
         paint: paint,
+        
+        paintKitId: paintKitId,
+        crateSeries: crateSeries,
+        outputDefindex: outputDefindex,
+        outputQuality: outputQuality,
+        craftNo: craftNo,
     } as IObjectItem;
 }
 

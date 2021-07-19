@@ -18,4 +18,9 @@ export default interface IObjectItem {
     effectName?: string | null,
     priceIndex?: number | null,
     paint?: string | null,
+
+    paintKitId?: number | null,
+    crateSeries?: number | null,
+    outputDefindex?: number | null,
+    outputQuality?: number | null,
 };

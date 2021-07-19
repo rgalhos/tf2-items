@@ -44,6 +44,11 @@ function test_skuToItemObject() {
             effectName: "'72",
             paint: "6666666",
             priceIndex: 776, // The Bird-Man of Aberdeen
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     );
 
@@ -66,6 +71,11 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     );
     
@@ -88,6 +98,11 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     );
 
@@ -110,6 +125,11 @@ function test_skuToItemObject() {
             effectName: "Massed Flies",
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     );
 
@@ -132,6 +152,11 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: 1182,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     );
 
@@ -154,6 +179,11 @@ function test_skuToItemObject() {
             effectId: null,
             paint: null,
             priceIndex: 518,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
         } as IObjectItem
     )
 }

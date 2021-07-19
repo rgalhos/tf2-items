@@ -79,6 +79,7 @@ function testKeys() {
 
     strictEqual(normal.isKey(), true);
     strictEqual(normal.isRestricted(), false);
+    strictEqual(normal.isAlwaysTradable(), true);
 
 
     // Scream Fortress 2018 War Paint Key
