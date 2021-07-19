@@ -118,14 +118,14 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
 
     if (mayBeUnusual) {
         // can be either unique, unusual with effect or unusual with elevated quality
-        for (const [_id, effectName] of schema.getAllUnusualEffects()) {
+        for (const [ id, effectName ] of schema.getAllUnusualEffects()) {
             if (name.startsWith(effectName + ' ')) {
                 if (quality === EQuality.Strange) { // Special case: Unusual with elevated quality
                     elevatedStrange = true;
                 }
 
                 quality = EQuality.Unusual;
-                effectId = schema.getUnusualEffectByName(effectName);
+                effectId = id;
         
                 name = name.replace(effectName + ' ', '');
 
