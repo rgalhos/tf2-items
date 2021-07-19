@@ -287,16 +287,11 @@ export default class Schema {
 function normalizeName(str: string) : string {
     return str
         .toLowerCase()
-        .replace("the ", '')
-        .replace("non-craftable ", '')
-        .replace("australium ", '')
-        .replace("festivized ", '')
+        .replace(/the /, '')
+        .replace(/non-craftable /, '')
+        .replace(/australium /, '')
+        .replace(/festivized /, '')
         .replace(/ +/g, ' ')
         .trim()
     ;
 }
-
-const defindexesOfCratesWithoutSeries = [
-    // Stockpile A and B
-    5737, 3738,
-];

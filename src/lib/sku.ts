@@ -29,71 +29,71 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
         uncraft = true;
         s.shift();
 
-        name = name.replace("Non-Craftable ", '');
+        name = name.replace(/Non-Craftable /, '');
     }
 
     // Get item quality
     if (s[0] === "Genuine") {
         quality = EQuality.Genuine;
 
-        name = name.replace("Genuine ", '');
+        name = name.replace(/Genuine /, '');
     } else if (s[0] === "Vintage") {
         quality = EQuality.Vintage;
 
-        name = name.replace("Vintage ", '');
+        name = name.replace(/Vintage /, '');
     }
     // Generic unusual
     else if (s[0] === "Unusual") {
         quality = EQuality.Unusual;
 
-        name = name.replace("Unusual ", '');
+        name = name.replace(/Unusual /, '');
     } else if (s[0] === "Community") {
         quality = EQuality.Community;
         
-        name = name.replace("Community ", '');
+        name = name.replace(/Community /, '');
     } else if (s[0] === "Valve") {
         quality = EQuality.Valve;
         
-        name = name.replace("Valve ", '');
+        name = name.replace(/Valve /, '');
     } else if (s[0] === "Self-Made") {
         quality = EQuality.SelfMade;
         
-        name = name.replace("Self-Made ", '');
+        name = name.replace(/Self-Made /, '');
     } else if (s[0] === "Strange") {
         // is strange genuine
         if (s[1] === "Genuine") {
             quality = EQuality.Genuine;
             elevatedStrange = true;
         
-            name = name.replace("Strange Genuine ", '');
+            name = name.replace(/Strange Genuine /, '');
         }
         // is strange vintage
         else if (s[1] === "Vintage") {
             quality = EQuality.Vintage;
             elevatedStrange = true;
 
-            name = name.replace("Strange Vintage ", '');
+            name = name.replace(/Strange Vintage /, '');
         }
         // is generic unusual with elevated quality
         else if (s[1] === "Unusual") {
             quality = EQuality.Unusual;
             elevatedStrange = true;
 
-            name = name.replace("Strange Unusual ", '');
+            name = name.replace(/Strange Unusual /, '');
         }
         // is strange haunted
         else if (s[1] === "Haunted") {
             quality = EQuality.Haunted;
             elevatedStrange = true;
 
-            name = name.replace("Strange Haunted ", '');
+            name = name.replace(/Strange Haunted /, '');
         }
         // is strange collector's
         else if (s[1] === "Collector's") {
             quality = EQuality.Collectors;
             elevatedStrange = true;
 
-            name = name.replace("Strange Collector's ", '');
+            name = name.replace(/Strange Collector's /, '');
         }
         // strange filter or strange part
         else if (s[1] === "Filter:" || s[1] === "Part:") {
@@ -101,17 +101,17 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
         } else {
             quality = EQuality.Strange;
             
-            name = name.replace("Strange ", '');
+            name = name.replace(/Strange /, '');
             mayBeUnusual = true; // May be an unusual with elevated quality
         }
     } else if (s[0] === "Haunted") {
         quality = EQuality.Haunted;
         
-        name = name.replace("Haunted ", '');
+        name = name.replace(/Haunted /, '');
     } else if (s[0] === "Collector's") {
         quality = EQuality.Collectors;
         
-        name = name.replace("Collector's ", '');
+        name = name.replace(/Collector's /, '');
     } else {
         mayBeUnusual = true;
     }
@@ -151,9 +151,9 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
         }
 
         name = name
-            .replace("Professional Killstreak ", '')
-            .replace("Specialized Killstreak ", '')
-            .replace("Killstreak ", '')
+            .replace(/Professional Killstreak /, '')
+            .replace(/Specialized Killstreak /, '')
+            .replace(/Killstreak /, '')
         ;
     }
 
@@ -197,13 +197,13 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
     // Australium
     if (name.includes("Australium ") && !name.includes("Australium Gold")) {
         australium = true;
-        name = name.replace("Australium ", '');
+        name = name.replace(/Australium /, '');
     }
 
     // Festivized
     if (name.includes("Festivized ")) {
         festivized = true;
-        name = name.replace("Festivized ", '');
+        name = name.replace(/Festivized /, '');
     }
 
     name = name.replace(/ +/g, ' ').trim();
