@@ -1,10 +1,13 @@
 import Schema from "../classes/Schema";
 import { EKillstreakTier } from "../enums/EKillstreak";
 import EQuality from "../enums/EQuality";
+import EWearTier from "../enums/EWearTier";
 import IObjectItem from "../interfaces/IObjectItem";
 
 // const sku_regExp = /\d+;\d+(;uncraftable)?(;untradable)?(;australium)?(;festive)?(;strange)?(;kt-(1|2|3))?(;u\d+)?(;p\d{7,8})?(;td-\d+)?$/;
-export const sku_regExp = /^(\d+);([0-9]|[1][0-5])(;((uncraftable)|(untrad(e)?able)|(australium)|(festive)|(strange)|((u|pk|td-|c|od-|oq-|p)\d+)|(w[1-5])|(kt-[1-3])|(n((100)|[1-9]\d?))))*?$/
+
+// Thanks idinium - https://github.com/TF2Autobot/tf2autobot/blob/86497afc1c442301894555ab710229085dab6266/src/lib/tools/testSKU.ts
+export const sku_regExp = /^(\d+);([0-9]|[1][0-5])(;((uncraftable)|(untrad(e)?able)|(australium)|(festive)|(strange)|((u|pk|td-|c|od-|oq-|p)\d+)|(w[1-5])|(kt-[1-3])|(n-?((100)|[1-9]\d?))))*?$/;
 
 export function testSku(sku: string) {
     return sku_regExp.test(sku);
@@ -22,8 +25,33 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
     let australium = false;
     let festivized = false;
     let mayBeUnusual = false;
+    let craftNo: number | null = null;
     
     let s = fullName.split(/ /g);
+    
+    // Special case: crate with series
+    if (/((Crate|Case|Cooler) \#[1-9](\d+)?)$/.test(fullName)) {
+        let crate: any = schema.getAllItemsSchema()
+            .filter(item => item.isCrate())
+            .filter(item => item.getCrateSeries() === Number(fullName.substr(fullName.lastIndexOf('#') + 1)))
+        ;
+
+        if (crate.length === 0) {
+            throw new Error(`crate not found: "${fullName}"`);
+        } else if (crate.length > 1) {
+            throw new Error(`wtf??? ${crate.length} items matched for "${fullName}"`);
+        } else {
+            crate = crate[0];
+            
+            return [ crate.defindex, 6, 'c' + crate.getCrateSeries() ].join(';');
+        }
+    }
+    // Special case: low-craft items
+    else if (/( \#((100)|[1-9]\d?))$/.test(fullName)) {
+        craftNo = Number((s.pop() as string).substr(1));
+
+        name = s.join(' ');
+    }
 
     if (s[0] === "Non-Craftable") {
         uncraft = true;
@@ -162,12 +190,11 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
         name = "Unusualifier";
 
         let match = fullName.match(/Unusual (.*?) Unusualifier/);
-        
-        if (!match || !match?.[1]) {
+        targetItem = schema.getItemDefindexByName(match?.[1] || "ayyyyyyyyyyyy");
+
+        if (!targetItem) {
             throw new Error("invalid item: unusualifier - invalid target");
         }
-
-        targetItem = schema.getItemDefindexByName(match[1]);
     }
 
     // Strangifier
@@ -176,22 +203,15 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
         /*
         // NOTE: Strangifiers are strange (ba dum tss)
         //       so I'm ignoring this special case and defining all strangifiers as "6522;6;td-#"
-        if (schema.getItemDefindexByName(fullName)) {
-            name = fullName;
-        } else {
-            name = "Strangifier";
-        }
         */
-
         name = "Strangifier";
 
         let match = fullName.match(/(.*?) Strangifier/);
+        targetItem = schema.getItemDefindexByName(match?.[1] || "ayyyyyyyyyyyy");
 
-        if (!match || !match?.[1]) {
+        if (!targetItem) {
             throw new Error("invalid item: strangifier - invalid target");
         }
-
-        targetItem = schema.getItemDefindexByName(match[1]);
     }
 
     // Australium
@@ -227,6 +247,7 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
     if (festivized) sku.push("festive");
     if (effectId) sku.push("u" + effectId);
     if (targetItem) sku.push("td-" + targetItem);
+    if (craftNo) sku.push("n-" + craftNo);
 
     return sku.join(';');
 }
@@ -266,6 +287,7 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
     let outputDefindex: number | null = null;
     let outputQuality: number | null = null;
     let craftNo: number | null = null;
+    let wear: EWearTier | null = null;
     let fullName: string[] = [];
 
     let s;
@@ -298,6 +320,8 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
             outputQuality = Number(s.substr(3));
         } else if (/n\d+/.test(s)) {
             craftNo = Number(s.substr(1));
+        } else if (/w\d/.test(s)) {
+            wear = Number(s.substr(1));
         }
     }
 
@@ -312,60 +336,90 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
     //////////////////////////////////////////
     /////////// BEGIN OF FULL NAME ///////////
     //////////////////////////////////////////
-    if (!craftable) {
-        fullName.push("Non-Craftable");
+    let itemSchema = schema.getItemSchema(defindex);
+
+    if (itemSchema?.isDecoratedWeapon()) {
+        console.warn("WARNING: Decorated weapons are not fully supported by tf2-schema");
     }
 
-    if (name === "Strangifier") {
-        if (!priceIndex && !targetName) {
-            throw new Error("generic strangifiers are not allowed");
+    if (!itemSchema) {
+        throw new Error(`no item found for defindex ${defindex}`);
+    }
+    // War paints
+    if (itemSchema.isWarPaint()) {
+        throw new Error("war paints are not supported");
+    }
+    // isCrate
+    else if (itemSchema.isCrate()) {
+        fullName = [ itemSchema.fullName ];
+    }
+    // Normal items
+    else {
+        if (!craftable) {
+            fullName.push("Non-Craftable");
         }
 
-        fullName.push(targetName as string, "Strangifier");
-    } else if (name === "Unusualifier") {
-        if (!priceIndex && !targetName) {
-            throw new Error("generic unusualifiers are not allowed");
-        }
-
-        fullName.push("Unusual", targetName as string, "Unusualifier");
-    } else {
-        if (effectId) {
-            effectName = schema.getUnusualEffectById(effectId) as string;
-
-            if (!effectName) {
-                throw new Error(`no unusual effect found for id ${effectId}`);
+        if (name === "Strangifier") {
+            if (!priceIndex && !targetName) {
+                throw new Error("generic strangifiers are not allowed");
             }
-        }
 
-        if (elevatedStrange) {
-            fullName.push("Strange");
-        }
-    
-        if (!effectId && quality === EQuality.Unusual) { // Generic unusual
-            fullName.push("Unusual");
-        } else if (effectId && quality === EQuality.Unusual) { // Unusual with effect
-            fullName.push(effectName as string);
-        } else if (effectId && quality !== EQuality.Unusual) { // Non-unusual with effect (such as Vintage Community Sparkle)
-            fullName.push(EQuality[quality], effectName as string);
-        } else if (quality !== EQuality.Unique) { // Non-Unusual with no effect
-            fullName.push(EQuality[quality]);
-        }
+            fullName.push(targetName as string, "Strangifier");
+        } else if (name === "Unusualifier") {
+            if (!priceIndex && !targetName) {
+                throw new Error("generic unusualifiers are not allowed");
+            }
 
-        if (festivized) {
-            fullName.push("Festivized");
-        }
+            fullName.push("Unusual", targetName as string, "Unusualifier");
+        } else {
+            if (effectId) {
+                effectName = schema.getUnusualEffectById(effectId) as string;
 
-        if (ksTier !== EKillstreakTier.None) {
-            if (ksTier === EKillstreakTier.Professional) fullName.push("Professional");
-            else if (ksTier === EKillstreakTier.Specialized) fullName.push("Specialized");
-            fullName.push("Killstreak");
-        }
+                if (!effectName) {
+                    throw new Error(`no unusual effect found for id ${effectId}`);
+                }
+            }
 
-        if (australium) {
-            fullName.push("Australium");
-        }
+            if (elevatedStrange) {
+                fullName.push("Strange");
+            }
+        
+            if (!effectId && quality === EQuality.Unusual) { // Generic unusual
+                fullName.push("Unusual");
+            } else if (effectId && quality === EQuality.Unusual) { // Unusual with effect
+                fullName.push(effectName as string);
+            } else if (effectId && quality !== EQuality.Unusual) { // Non-unusual with effect (such as Vintage Community Sparkle)
+                fullName.push(EQuality[quality], effectName as string);
+            } else if (quality !== EQuality.Unique) { // Non-Unusual with no effect
+                fullName.push(EQuality[quality]);
+            }
 
-        fullName.push(name);
+            if (festivized) {
+                fullName.push("Festivized");
+            }
+
+            if (ksTier !== EKillstreakTier.None) {
+                if (ksTier === EKillstreakTier.Professional) fullName.push("Professional");
+                else if (ksTier === EKillstreakTier.Specialized) fullName.push("Specialized");
+                fullName.push("Killstreak");
+            }
+
+            if (australium) {
+                fullName.push("Australium");
+            }
+
+            fullName.push(name);
+
+            if (craftNo) {
+                fullName.push("#" + craftNo);
+            }
+
+            if (wear === EWearTier.FactoryNew) fullName.push("(Factory New)");
+            else if (wear === EWearTier.MinimalWear) fullName.push("(Minimal Wear)");
+            else if (wear === EWearTier.FieldTested) fullName.push("(Field-Tested)");
+            else if (wear === EWearTier.WellWorn) fullName.push("(Well-Worn)");
+            else if (wear === EWearTier.BattleScarred) fullName.push("(Battle-Scarred)");
+        }
     }
 
     //////////////////////////////////////////
@@ -394,6 +448,7 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
         outputDefindex: outputDefindex,
         outputQuality: outputQuality,
         craftNo: craftNo,
+        wear: wear,
     } as IObjectItem;
 }
 

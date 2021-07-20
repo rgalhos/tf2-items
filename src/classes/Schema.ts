@@ -252,7 +252,7 @@ export default class Schema {
     }
 
     public getAllItemsSchema() : SchemaItem[] {
-        return Object.values(this.itemSchema);
+        return Array.from(this.itemSchema.values());
     }
 
     public getAllUnusualEffects() {

@@ -1,3 +1,5 @@
+import { EKillstreakTier } from "../enums/EKillstreak";
+import EQuality from "../enums/EQuality";
 import IItemAttribute from "../interfaces/IItemAttribute";
 import ISchemaItem from "../interfaces/ISchemaItem";
 
@@ -31,6 +33,10 @@ export function getCrateKey(item: ISchemaItem) {
     return _getValue("decoded_by_itemdefindex", item);
 }
 
+export function getDefaultQuality(item: ISchemaItem) {
+    return item.item_quality;
+}
+
 export function isCrate(item: ISchemaItem) {
     return item.item_class === "supply_crate" || keyLessCratesDefindexes.indexOf(item.defindex) !== -1;
 }
@@ -41,6 +47,14 @@ export function isKey(item: ISchemaItem) {
 
 export function isPaintCan(item: ISchemaItem) {
     return item?.tool?.type === "paint_can";
+}
+
+export function isWarPaint(item: ISchemaItem) {
+    return getDefaultQuality(item) === EQuality.DecoratedWeapon && item.tool?.type === "paintkit";
+}
+
+export function isDecoratedWeapon(item: ISchemaItem) {
+    return item.item_quality === EQuality.DecoratedWeapon && !isWarPaint(item);
 }
 
 export function isUntradableByDefault(item: ISchemaItem) {
@@ -69,6 +83,14 @@ export function isRestricted(item: ISchemaItem) : string | false {
 
 export function isStrangifier(item: ISchemaItem)  {
     return item?.tool?.type === "strangifier" && item?.tool?.usage_capabilities?.can_strangify === true;
+}
+
+export function isKillstreakKit(item: ISchemaItem) : EKillstreakTier | false {
+    if (item?.tool?.type !== "killstreakifier") {
+        return false;
+    }
+
+    return  _getValue("killstreak_tier", item) || false;
 }
 
 export function isStrangeFilter(item: ISchemaItem) {
