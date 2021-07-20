@@ -49,6 +49,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -76,6 +77,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     );
     
@@ -103,6 +105,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -130,6 +133,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -157,6 +161,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -184,6 +189,7 @@ function test_skuToItemObject() {
             outputDefindex: null,
             outputQuality: null,
             craftNo: null,
+            wear: null,
         } as IObjectItem
     )
 }

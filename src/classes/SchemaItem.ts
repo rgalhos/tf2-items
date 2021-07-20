@@ -1,4 +1,3 @@
-import EQuality from "../enums/EQuality";
 import ISchemaItem from "../interfaces/ISchemaItem";
 import ASchemaItem from "../interfaces/ASchemaItem";
 import * as itemAttributes from "../lib/attributes";
@@ -49,6 +48,14 @@ export default class SchemaItem extends ASchemaItem {
     public isPaintCan() {
         return itemAttributes.isPaintCan(this);
     }
+
+    public isWarPaint() {
+        return itemAttributes.isWarPaint(this);
+    }
+
+    public isDecoratedWeapon() {
+        return itemAttributes.isDecoratedWeapon(this);
+    }
     
     public isUntradableByDefault() {
         return itemAttributes.isUntradableByDefault(this);
@@ -76,6 +83,10 @@ export default class SchemaItem extends ASchemaItem {
     
     public isStrangifier()  {
         return itemAttributes.isStrangifier(this);
+    }
+
+    public isKillstreakKit() {
+        return itemAttributes.isKillstreakKit(this);
     }
     
     public isStrangeFilter() {

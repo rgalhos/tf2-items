@@ -1,5 +1,6 @@
 import { EKillstreakTier } from "../enums/EKillstreak";
 import EQuality from "../enums/EQuality";
+import EWearTier from "../enums/EWearTier";
 
 export default interface IObjectItem {
     sku: string,
@@ -23,4 +24,5 @@ export default interface IObjectItem {
     crateSeries?: number | null,
     outputDefindex?: number | null,
     outputQuality?: number | null,
+    wear?: EWearTier | null,
 };

@@ -145,6 +145,7 @@ export default class Schema {
                     if (unusual.system.startsWith("unusual_")
                         || unusual.system.startsWith("utaunt_")
                         || unusual.system.startsWith("superrare_")
+                        || unusual.system.startsWith("weapon_unusual_")
                         || unusual.system === "community_sparkle"
                     ) {
                         this._addUnusualEffect(unusual.id, unusual.name);
@@ -248,6 +249,10 @@ export default class Schema {
 
     public getItemSchema(defindex: number) {
         return this.itemSchema.get(Number(defindex));
+    }
+
+    public getAllItemsSchema() : SchemaItem[] {
+        return Object.values(this.itemSchema);
     }
 
     public getAllUnusualEffects() {
