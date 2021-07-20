@@ -36,15 +36,14 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
             .filter(item => item.getCrateSeries() === Number(fullName.substr(fullName.lastIndexOf('#') + 1)))
         ;
 
+        // Generic crate
         if (crate.length === 0) {
-            throw new Error(`crate not found: "${fullName}"`);
-        } else if (crate.length > 1) {
-            throw new Error(`wtf??? ${crate.length} items matched for "${fullName}"`);
-        } else {
-            crate = crate[0];
-            
-            return [ crate.defindex, 6, 'c' + crate.getCrateSeries() ].join(';');
+            crate = [ schema.getItemSchema(5022) ];
         }
+
+        crate = crate[0];
+
+        return [ crate.defindex, 6, 'c' + crate.getCrateSeries() ].join(';');
     }
     // Special case: low-craft items
     else if (/( \#((100)|[1-9]\d?))$/.test(fullName)) {
