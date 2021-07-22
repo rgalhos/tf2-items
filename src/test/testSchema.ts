@@ -5,11 +5,15 @@ import TestLog from "./utils";
 import { deepStrictEqual, strictEqual, throws } from "assert";
 import { EKillstreakTier } from "../enums/EKillstreak";
 
-const schema = new Schema("steamApiKeyHere", false);
+var schema: Schema;
 
-schema.load().then(test);
+export default function testSchema(_schema: Schema) {
+    schema = _schema;
+    
+    schema.load().then(startTest);
+}
 
-function test() {
+function startTest() {
     if (!schema.isReady) {
         throw new Error("promise resolved too early");
     } else if (schema.getAllUnusualEffects().length === 0) {
@@ -40,6 +44,12 @@ function test_skuToItemObject() {
             effectName: "'72",
             paint: "6666666",
             priceIndex: 776, // The Bird-Man of Aberdeen
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -62,6 +72,12 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     );
     
@@ -84,6 +100,12 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -106,6 +128,12 @@ function test_skuToItemObject() {
             effectName: "Massed Flies",
             paint: null,
             priceIndex: null,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -114,7 +142,7 @@ function test_skuToItemObject() {
         schema.skuToItemObject("9258;5;uncraftable;td-1182"),
         {
             sku: "9258;5;uncraftable;td-1182",
-            name: "Taunt Unusualifier",
+            name: "Unusualifier",
             fullName: "Non-Craftable Unusual Taunt: Yeti Punch Unusualifier",
             defindex: 9258,
             quality: EQuality.Unusual,
@@ -128,6 +156,12 @@ function test_skuToItemObject() {
             effectName: null,
             paint: null,
             priceIndex: 1182,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     );
 
@@ -150,6 +184,12 @@ function test_skuToItemObject() {
             effectId: null,
             paint: null,
             priceIndex: 518,
+            paintKitId: null,
+            crateSeries: null,
+            outputDefindex: null,
+            outputQuality: null,
+            craftNo: null,
+            wear: null,
         } as IObjectItem
     )
 }
