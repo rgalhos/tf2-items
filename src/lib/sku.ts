@@ -24,26 +24,33 @@ export function fullNameToSku(fullName: string, schema: Schema) : string {
     let targetItem = null;
     let australium = false;
     let festivized = false;
-    let mayBeUnusual = false;
     let craftNo: number | null = null;
+    let mayBeUnusual = false;
     
     let s = fullName.split(/ /g);
     
     // Special case: crate with series
-    if (/((Crate|Case|Cooler) \#[1-9](\d+)?)$/.test(fullName)) {
+    if (/((Crate|Case|Cooler|Munition|Strongbox) \#[1-9](\d+)?)$/.test(fullName)) {
         let crate: any = schema.getAllItemsSchema()
             .filter(item => item.isCrate())
             .filter(item => item.getCrateSeries() === Number(fullName.substr(fullName.lastIndexOf('#') + 1)))
         ;
 
+        let series;
+
         // Generic crate
         if (crate.length === 0) {
-            crate = [ schema.getItemSchema(5022) ];
+            if (schema.options.enableGenericCrates) {
+                crate = [ schema.getItemSchema(schema.options.enableGenericCrates as number) ];
+                series = Number(fullName.substr(fullName.lastIndexOf('#') + 1));
+            } else {
+                throw new Error("generic crates are disabled");
+            }
         }
 
         crate = crate[0];
 
-        return [ crate.defindex, 6, 'c' + crate.getCrateSeries() ].join(';');
+        return [ crate.defindex, 6, 'c' + series || crate.getCrateSeries() ].join(';');
     }
     // Special case: low-craft items
     else if (/( \#((100)|[1-9]\d?))$/.test(fullName)) {
@@ -337,13 +344,14 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
     //////////////////////////////////////////
     let itemSchema = schema.getItemSchema(defindex);
 
-    if (itemSchema?.isDecoratedWeapon()) {
-        console.warn("WARNING: Decorated weapons are not fully supported by tf2-schema");
-    }
-
     if (!itemSchema) {
         throw new Error(`no item found for defindex ${defindex}`);
     }
+
+    if (itemSchema.isDecoratedWeapon()) {
+        console.warn("WARNING: Decorated weapons are not fully supported by tf2-schema");
+    }
+
     // War paints
     if (itemSchema.isWarPaint()) {
         throw new Error("war paints are not supported");
@@ -359,17 +367,21 @@ export function skuToItemObject(_sku: string, schema: Schema) : IObjectItem {
         }
 
         if (name === "Strangifier") {
-            if (!priceIndex && !targetName) {
+            if (!schema.options.enableGenericStrangifiers && !priceIndex && !targetName) {
                 throw new Error("generic strangifiers are not allowed");
+            } else if (!targetName) {
+                fullName.push("Strangifier");
+            } else {
+                fullName.push(targetName as string, "Strangifier");
             }
-
-            fullName.push(targetName as string, "Strangifier");
         } else if (name === "Unusualifier") {
-            if (!priceIndex && !targetName) {
+            if (!schema.options.enableGenericUnusualifiers && (!priceIndex || !targetName)) {
                 throw new Error("generic unusualifiers are not allowed");
+            } else if (!targetName) {
+                fullName.push("Unusualifier");
+            } else {
+                fullName.push("Unusual", targetName as string, "Unusualifier");
             }
-
-            fullName.push("Unusual", targetName as string, "Unusualifier");
         } else {
             if (effectId) {
                 effectName = schema.getUnusualEffectById(effectId) as string;

@@ -27,10 +27,37 @@ export default class Schema {
     private rawSchemaOverview: null | IRawSchemaOverview = null;
     private rawSchemaItems: null | IRawSchemaItems = null;
 
+    // Options
+    public options: SchemaOptions = {
+        enableGenericStrangifiers: false,
+        enableGenericUnusualifiers: false,
+        enableGenericCrates: 5022,
+    };
+
     private readonly steamApiKey: string;
     private ready: boolean = false;
 
-    constructor(steamApiKey: string) {
+    constructor(options: string | SchemaOptions) {
+        let steamApiKey: string;
+
+        if (typeof options === "string") {
+            steamApiKey = options;
+        } else {
+            steamApiKey = options.steamApiKey as string;
+            delete options.steamApiKey;
+
+            if (options.enableGenericCrates === true) {
+                options.enableGenericCrates = 5022;
+            } else if (options.enableGenericCrates !== false
+                || options.enableGenericCrates !== undefined
+                || typeof options.enableGenericCrates !== "number"
+            ) {
+                throw new Error("'enableGenericCrates' must be a defindex or boolean (true = #5022)");
+            }
+
+            Object.assign(this.options, options);
+        }
+        
         if (!steamApiKey) {
             throw new Error("no steam api key");
         }
@@ -48,6 +75,9 @@ export default class Schema {
         return this.ready;
     }
 
+    /**
+     * @async
+     */
     public async load() {
         this.ready = false;
 
@@ -300,3 +330,10 @@ function normalizeName(str: string) : string {
         .trim()
     ;
 }
+
+interface SchemaOptions {
+    steamApiKey?: string,
+    enableGenericStrangifiers?: boolean,
+    enableGenericUnusualifiers?: boolean,
+    enableGenericCrates: number | boolean,
+};
