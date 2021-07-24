@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import axios from "axios";
 import * as skuUtils from "../lib/sku";
 import * as itemAttributes from "../lib/attributes";
@@ -29,6 +30,8 @@ export default class Schema {
 
     // Options
     public options: SchemaOptions = {
+        cacheSchema: true,
+        cacheFilePath: "../../cache/schema.json",
         enableGenericStrangifiers: false,
         enableGenericUnusualifiers: false,
         enableGenericCrates: 5022,
@@ -49,8 +52,8 @@ export default class Schema {
             if (options.enableGenericCrates === true) {
                 options.enableGenericCrates = 5022;
             } else if (options.enableGenericCrates !== false
-                || options.enableGenericCrates !== undefined
-                || typeof options.enableGenericCrates !== "number"
+                && options.enableGenericCrates !== undefined
+                && typeof options.enableGenericCrates !== "number"
             ) {
                 throw new Error("'enableGenericCrates' must be a defindex or boolean (true = #5022)");
             }
@@ -82,7 +85,20 @@ export default class Schema {
         this.ready = false;
 
         await this.loadSchemaOverview();
-        await this.downloadItemSchema();
+
+        if (!this.options.cacheSchema) {
+            console.debug("Option to cache schema is disabled");
+            await this.downloadItemSchema();
+        } else {
+            console.debug("Option to cache schema is enabled!!!");
+            try {
+                await this._getCachedSchema();
+            } catch(e) {
+                console.debug(e);
+                await this.downloadItemSchema();
+            }
+        }
+
         await this.loadItemSchema();
 
         this.ready = true;
@@ -195,13 +211,14 @@ export default class Schema {
                     language: "english",
                     start: start,
                 }
-            }).then(({ status, statusText, data }) => {
+            }).then(({ status, statusText, data, headers }) => {
                 if (status !== 200) {
                     return reject(`failed to get full item schema: status code not 200: ${statusText} (${status})`);
                 }
 
                 if (!this.rawSchemaItems) {
-                    this.rawSchemaItems = data.result;
+                    this.rawSchemaItems = data.result as IRawSchemaItems;
+                    this.rawSchemaItems.headers = headers;
                 } else {
                     this.rawSchemaItems.items = this.rawSchemaItems.items.concat(data.result.items);
                 }
@@ -216,41 +233,22 @@ export default class Schema {
         });
     }
 
+    /**
+     * @async
+     */
     public async downloadItemSchema() : Promise<void> {
+        console.debug("Downloading item schema...");
+
         let index: number | null = 0;
 
         while (index !== null)
             index = await this._downloadItemSchema(index);
+        
+        if (this.options.cacheSchema) {
+            fs.writeFileSync(path.join(__dirname, this.options.cacheFilePath as string), JSON.stringify(this.rawSchemaItems), { encoding: "utf-8" });
+        }
 
         return;
-    }
-
-    public saveSchema(path: fs.PathOrFileDescriptor, version: string = "1.3.0") : Promise<void> {
-        return new Promise((resolve, reject) => {
-            // @ts-ignore
-            if (!this.isReady || Object.keys(this.rawSchemaItems).length === 0) {
-                return reject("schema not loaded");
-            }
-
-            fs.writeFile(path, JSON.stringify({
-                success: true,
-                version: version,
-                time: Date.now(),
-                raw: {
-                    schema: {
-                        ...this.rawSchemaOverview,
-                        items: (this.rawSchemaItems as IRawSchemaItems).items,
-                    },
-                    // items_game: this.rawItemsGame,
-                }
-            }), (err) => {
-                if (err) {
-                    return reject(err);
-                }
-
-                resolve();
-            })
-        });
     }
 
     public getRawSchemaOverview() {
@@ -317,6 +315,53 @@ export default class Schema {
         this.itemsByDefindex.delete(defindex);
         this.itemsByName.delete(normalizeName(name));
     }
+
+    private _getCachedSchema() : Promise<void> {
+        console.debug("Getting cached item schema...");
+
+        return new Promise((resolve, reject) => {
+            if (!this.options.cacheFilePath) {
+                return reject("no cache file");
+            }
+
+            fs.readFile(path.join(__dirname, this.options.cacheFilePath) as string, { encoding: "utf-8" }, (err, data: any) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                data = JSON.parse(data as string);
+
+                this._getSchemaItemsHeader().then(headers => {
+                    if (headers["last-modified"] === data.headers["last-modified"]) {
+                        console.debug("Cached schema is up to date!");
+                        this.rawSchemaItems = data;
+                        resolve();
+                    } else {
+                        console.debug("Cached schema is out of date! Refreshing...");
+                        reject("cached schema is outdated");
+                    }
+                }).catch(reject);
+            });
+        });
+    }
+
+    private _getSchemaItemsHeader() : Promise<any> {
+        console.debug("Geting SchemaItems headers...");
+
+        return new Promise((resolve, reject) => {
+            axios({
+                url: SCHEMA_ITEMS,
+                method: "GET",
+                params: {
+                    key: this.steamApiKey,
+                    language: "english",
+                }
+            }).then(({ headers }) => {
+                console.debug("Got SchemaItems headers!", headers);
+                resolve(headers);
+            }).catch(reject);
+        });
+    }
 }
 
 function normalizeName(str: string) : string {
@@ -333,7 +378,15 @@ function normalizeName(str: string) : string {
 
 interface SchemaOptions {
     steamApiKey?: string,
+    cacheSchema?: boolean,
+    cacheFilePath?: string,
     enableGenericStrangifiers?: boolean,
     enableGenericUnusualifiers?: boolean,
-    enableGenericCrates: number | boolean,
+    enableGenericCrates?: number | boolean,
 };
+
+console.debug = (...args: any[]) => {
+    if (process.argv[4] === "debug") {
+        console.log(...args);
+    }
+}
