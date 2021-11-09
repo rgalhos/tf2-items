@@ -7,6 +7,9 @@
 # NPM crap
 package-lock.json
 
+# Cache
+schema.json
+
 # Logs
 /logs
 *.log

@@ -31,7 +31,7 @@ export default class Schema {
     // Options
     public options: SchemaOptions = {
         cacheSchema: true,
-        cacheFilePath: "../../cache/schema.json",
+        cacheFilePath: "./schema.json",
         enableGenericStrangifiers: false,
         enableGenericUnusualifiers: false,
         enableGenericCrates: 5022,
@@ -245,7 +245,7 @@ export default class Schema {
             index = await this._downloadItemSchema(index);
         
         if (this.options.cacheSchema) {
-            fs.writeFileSync(path.join(__dirname, this.options.cacheFilePath as string), JSON.stringify(this.rawSchemaItems), { encoding: "utf-8" });
+            fs.writeFileSync(this.options.cacheFilePath as string, JSON.stringify(this.rawSchemaItems), { encoding: "utf-8" });
         }
 
         return;
@@ -324,7 +324,7 @@ export default class Schema {
                 return reject("no cache file");
             }
 
-            fs.readFile(path.join(__dirname, this.options.cacheFilePath) as string, { encoding: "utf-8" }, (err, data: any) => {
+            fs.readFile(this.options.cacheFilePath as string, { encoding: "utf-8" }, (err, data: any) => {
                 if (err) {
                     return reject(err);
                 }
